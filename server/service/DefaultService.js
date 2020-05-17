@@ -8,5 +8,5 @@ const db = require("../data/database");
  * returns Object
  **/
 exports.accountBalanceGET = function() {
-  return Promise.resolve({ balance: db.getBalance() });
+  return db.getBalance();
 };

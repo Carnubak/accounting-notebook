@@ -9,7 +9,7 @@ const db = require("../data/database");
  * returns Transaction
  **/
 exports.commitTransaction = function(body) {
-  return Promise.resolve(db.addTransaction(body));
+  return db.addTransaction(body);
 };
 
 /**
@@ -20,7 +20,7 @@ exports.commitTransaction = function(body) {
  * returns Transaction
  **/
 exports.getTransactionById = function(transactionId) {
-  return Promise.resolve(db.getTransaction(transactionId));
+  return db.getTransaction(transactionId);
 };
 
 /**
@@ -29,5 +29,5 @@ exports.getTransactionById = function(transactionId) {
  * returns List
  **/
 exports.transactionsHistory = function() {
-  return Promise.resolve(db.getAllTransactions());
+  return db.getAllTransactions();
 };

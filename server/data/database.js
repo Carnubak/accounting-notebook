@@ -4,8 +4,17 @@ const { v4: uuid4 } = require("uuid");
 
 var transactions = {};
 var transactionIds = [];
+var balance = 0;
+let locked = false;
 
 exports.addTransaction = function addTransaction({ type, amount }) {
+  if (locked) {
+    return Promise.reject({ code: 409, payload: "Locked resource" });
+  }
+  if (type === "debit" && amount > balance) {
+    return Promise.reject({ code: 403, payload: "Insufficient balance" });
+  }
+  locked = true;
   const id = uuid4();
   const effectiveDate = new Date().toISOString();
   const record = {
@@ -15,31 +24,42 @@ exports.addTransaction = function addTransaction({ type, amount }) {
   };
   transactions[id] = record;
   transactionIds.push(id);
-  return {
+  if (type === "credit") {
+    balance = balance + amount;
+  } else {
+    balance = balance - amount;
+  }
+  locked = false;
+  return Promise.resolve({
     id,
     ...record
-  };
-};
-
-exports.getTransaction = function getTransaction(id) {
-  return transactions[id];
-};
-
-exports.getAllTransactions = function getAllTransactions() {
-  return transactionIds.map(id => {
-    return {
-      id,
-      ...transactions[id]
-    };
   });
 };
 
+exports.getTransaction = function getTransaction(id) {
+  if (locked) {
+    return Promise.reject({ code: 409, payload: "Locked resource" });
+  }
+  return Promise.resolve(transactions[id]);
+};
+
+exports.getAllTransactions = function getAllTransactions() {
+  if (locked) {
+    return Promise.reject({ code: 409, payload: "Locked resource" });
+  }
+  return Promise.resolve(
+    transactionIds.map(id => {
+      return {
+        id,
+        ...transactions[id]
+      };
+    })
+  );
+};
+
 exports.getBalance = function getBalance() {
-  return transactionIds.reduce((total, nextId) => {
-    if (transactions[nextId].type === "credit") {
-      return total + transactions[nextId].amount;
-    } else {
-      return total - transactions[nextId].amount;
-    }
-  }, 0);
+  if (locked) {
+    return Promise.reject({ code: 409, payload: "Locked resource" });
+  }
+  return Promise.resolve({ balance });
 };
