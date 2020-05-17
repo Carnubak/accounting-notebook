@@ -25,4 +25,5 @@
 package.json
 test-requests.http
 data/database.js
+index.js
 service/**
