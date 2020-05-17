@@ -23,3 +23,5 @@
 #!docs/README.md
 
 test-requests.http
+data/database.js
+service/**
