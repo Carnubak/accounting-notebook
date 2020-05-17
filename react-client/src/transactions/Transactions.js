@@ -6,7 +6,11 @@ function Transactions({ transactions }) {
   return (
     <Accordion>
       {transactions.map(transaction => (
-        <Card key={transaction.id}>
+        <Card
+          key={transaction.id}
+          bg={transaction.type === "credit" ? "success" : "danger"}
+          text="white"
+        >
           <Accordion.Toggle as={Card.Header} eventKey={transaction.id}>
             <strong>$</strong> {transaction.amount} {transaction.type}
           </Accordion.Toggle>
